@@ -70,8 +70,8 @@ TABLE OF CONTENTS:
 
         Whitespace and comments are ommitted in this description.
 
-        To put it in words, /regex/ defines a regular expression that would
-        match a single token in the input. "quoted" would match a single
+        To put it in words, /regex/ defines a regular expression that would     | I guess both longest match and
+        match a single token in the input. "quoted" would match a single        | quoted first resolve ambiguity.
         string. <english description> contains an informal description of what
         characters would match.
 
@@ -85,7 +85,7 @@ TABLE OF CONTENTS:
 
     2.2. As-If Rule:
 
-        Anything specified here may be treated however the compiler wishes,
+        Anything specified here may be treated however the compiler wishes,     | Here as in this entire document?
         as long as the result is observed as if the semantics specified were
         followed strictly.
 
@@ -100,17 +100,17 @@ TABLE OF CONTENTS:
 
             /* this is a comment /* with another inside */ */
 
-        Alternatively, '//' may be used to denote a comment. This comment
-        will extend to the end of the current line. Newlines within a line
-        comment may not be escaped.
-
+        Alternatively, '//' may be used to denote a comment. This comment       | how about // and /* nesting? e.g.
+        will extend to the end of the current line. Newlines within a line      | /* foo // bar */
+        comment may not be escaped.                                             | // baz */
+                                                                                | */
             // this is a line comment
             // it will end on this line, regardless of the trailing \
 
         Identifiers begin with any alphabetic character or underscore, and
-        continue with alphanumeric characters or underscores. Currently the
-        compiler places a limit of 1024 bytes on the length of the identifier.
-
+        continue with alphanumeric characters or underscores. Currently the     | What the current compiler does is irrelevant, does mparse have this limit?
+        compiler places a limit of 1024 bytes on the length of the identifier.  | A suggested upper limit in the spec is probably ok though.
+                                                                                | C defines a bunch of reasonable limits like this.
             some_id_234__
 
         Keywords are a special class of identifier that is reserved by the
@@ -118,10 +118,10 @@ TABLE OF CONTENTS:
         listed below. Their meanings will be covered later in this reference
         manual.
 
-            $noret          _               break
-            castto          const           continue
-            elif            else            extern
-            false           for             generic
+            $noret          _               break                               | $noret stands out here, i guess its
+            castto          const           continue                            | because its an attribute, what other
+            elif            else            extern                              | attributes would be possible in the future?
+            false           for             generic                             | why is extern not prefixed with $?
             goto            if              impl
             in              match           pkg
             pkglocal        sizeof          struct
@@ -140,9 +140,9 @@ TABLE OF CONTENTS:
 
     3.2. Top Level Structure:
 
-            file:       (decl | package | use | impldef | traitdef | tydef)*
-
-        A file is composed of a sequence of top level elements. These
+            file:       (decl | package | use | impldef | traitdef | tydef)*    | I would consider limiting use/pkg statements to
+                                                                                | only appear at the top of a file.
+        A file is composed of a sequence of top level elements. These           | It simplifies fast lexical dependency scanning in go anyway.
         top level elements consist of:
 
         - Declarations:
@@ -182,7 +182,7 @@ TABLE OF CONTENTS:
     3.3. Declarations:
 
             decl:       attrs ("var" | "const" | "generic")  decllist
-            attrs:      ("exern" | "pkglocal" | "$noret")+
+            attrs:      ("exern" | "pkglocal" | "$noret")+                      | s/exern/extern/ -
             decllist:   declbody ("," declbody)*
             declbody:   declcore ["=" expr]
             declcore:   name [":" type]
@@ -216,7 +216,7 @@ TABLE OF CONTENTS:
                         Assigning a definition to this variable within the
                         file that contains the extern definition is an error.
 
-            pkglocal:   Declares a variable which is local to the package.
+            pkglocal:   Declares a variable which is local to the package.      | normal variables aren't like this?
                         This variable may be used from other files that
                         declare the same `pkg` namespace, but referring to
                         it from outside the namespace is an error.
@@ -305,7 +305,7 @@ TABLE OF CONTENTS:
         In Myrddin, declarations may appear in any order, and be used at any
         point at which it is in scope. Any global symbols are initialized
         before the program begins. Any nonglobal symbols are initialized
-        on the line where they are defined. This decision allows for slightly
+        on the line where they are defined. This decision allows for slightly   | I assume 'defined' means first assignment.
         strange code, but allows for mutually recursive functions with no
         forward declarations or special cases.
 
@@ -330,8 +330,8 @@ TABLE OF CONTENTS:
 
         3.5.2. Capturing Variables:
 
-            When a closure is created, it captures all of the variables
-            that it refers to in its scope by value. This allows for
+            When a closure is created, it captures all of the variables        
+            that it refers to in its scope by value. This allows for            | globals aren't captured by value.
             simple heapification of the closure.
 
             For example:
@@ -376,7 +376,7 @@ TABLE OF CONTENTS:
 
         primitivetype:      misctype | inttype | flttype
         misctype:           "void"  | "bool" | "char" | "byte"
-        inttype:             "int8" |  "uint8" |
+        inttype:             "int8" |  "uint8" |                                | alignment bug
                             "int16" | "uint16" |
                             "int32" | "uint32" |
                             "int64" | "uint64" |
@@ -419,13 +419,13 @@ TABLE OF CONTENTS:
                 arraytype:      type "[" expr "]" | type "[" "..." "]"
 
             Pointers are values that contain the address of the value of their
-	    base type. If `t` is a type, then `t#` is a `pointer to t`.
+	    base type. If `t` is a type, then `t#` is a `pointer to t`.             | Mixing tab and space
 
             Arrays are a sequence of N values, where N is part of the type, meaning
             that different sizes are incompatible. They are passed by value. Their
             size must be a compile time constant.
 
-            If the array size is specified as "...", then the array has zero bytes
+            If the array size is specified as "...", then the array has zero bytes   | Note, in go this is used for inferred array size from initializer, dunno if we want that feature.
             allocated to store it, and bounds are not checked.  This is used to
             facilitate flexible arrays at the end of a struct, as well as C ABI.
 
@@ -458,7 +458,7 @@ TABLE OF CONTENTS:
 
                 (int, int, char)            a tuple of 2 ints and a char
 
-		struct                      a struct containing an int named
+		struct                      a struct containing an int named            | more tab/space mixing
 		    a : int                 'a', and a char named 'b'.
 		    b : char
 		;;
@@ -759,7 +759,7 @@ TABLE OF CONTENTS:
 
             The indexable trait is a built in trait which implies that
             the index operator can be used on the type. It is implemented
-            for slice and array types.
+            for slice and array types.                                          | missing the "A user cannot implement..."
 
         4.6.5. sliceable
 
@@ -800,7 +800,7 @@ TABLE OF CONTENTS:
             __iterfin__ is called at the end of the loop to do any cleanup
             of resources set up by __iternext__.
 
-            The iterable trait is implemented for slices and arrays.
+            The iterable trait is implemented for slices and arrays.            | I suppose iterating a [...] array will just do nothing.
 
 5. VALUES AND EXPRESSIONS
 
@@ -845,7 +845,7 @@ TABLE OF CONTENTS:
                 String literals begin with a ", and continue to the next
                 unescaped ".
 
-                    eg: "foo\"bar"
+                    eg: "foo\"bar"                                              | eg -> e.g. ?
 
                 Multiple consecutive string literals are implicitly merged to create
                 a single combined string literal. To allow a string literal to span
@@ -862,7 +862,7 @@ TABLE OF CONTENTS:
                 character set. A character starts with a single quote,
                 contains a single codepoint worth of text, encoded either as
                 an escape sequence or in the input character set for the
-                compiler (generally UTF8).  They share the same set of escape
+                compiler (generally UTF8).  They share the same set of escape   | Do you really want to allow compilers that aren't utf8?
                 sequences as string literals.
 
                     eg: 'א', '\n', '\u{1234}'
@@ -883,8 +883,8 @@ TABLE OF CONTENTS:
 
             5.1.1.4: Boolean Literals:
 
-                Boolean literals are spelled `true` or `false`.
-                Unsurprisingly, they evaluate to `true` or `false`
+                Boolean literals are spelled `true` or `false`.                 | Is there a reason true/false/void are keywords? 
+                Unsurprisingly, they evaluate to `true` or `false`              | I suppose its stupid to allow them to be shadowed.
                 respectively.
 
                     eg: true, false
@@ -895,7 +895,7 @@ TABLE OF CONTENTS:
 
                 Void literals are spelled `void`. They evaluate to the void
                 value, a value that takes zero bytes storage, and contains
-                only the value `void`. Like my soul.
+                only the value `void`. Like my soul.                            | The plight of a language designer.
 
                     eg: void
 
@@ -933,7 +933,7 @@ TABLE OF CONTENTS:
             omitted, then the value is initialized to the zero value for
             that type.
 
-            Sequence literals describe either an array or a structure
+            Sequence literals describe either an array or a structure           | So arrays are not zero initialized?
             literal. They begin with a '[', followed by an initializer
             sequence and closing ']'. For array literals, the initializer
             sequence is either an indexed initializer sequence[4], or an
@@ -983,7 +983,7 @@ TABLE OF CONTENTS:
             
             If a function is defined where stack variables are in scope,
             and it refers to them, then the stack variables shall be copied
-            to an environment on thes stack. That environment is scoped to
+            to an environment on thes stack. That environment is scoped to      | s/thes/the/
             the lifetime of the stack frame in which it was defined. If it
             does not refer to any of its enclosing stack variables, then
             this environment will not be created or accessed by the function.
@@ -1185,7 +1185,7 @@ TABLE OF CONTENTS:
 
             is equivalent to:
                 
-                var anon666 = 123
+                var anon666 = 123                                               | praise satan ;-)
 
             In match contexts, it is equivalent to a fresh variable in the
             match, again, given that it is never read from in the body of the
@@ -1276,7 +1276,7 @@ TABLE OF CONTENTS:
                 -------------------------------------------------------------
                 pointer/slice conversions
                 -------------------------------------------------------------
-                T[:]    T#          Returns a pointer to t[0]
+                T[:]    T#          Returns a pointer to t[0]                   | Missing slice to ptr cast.
                 -------------------------------------------------------------
                 pointer/function conversions
                 -------------------------------------------------------------
@@ -1303,9 +1303,9 @@ TABLE OF CONTENTS:
             of the expression is stored on the left hand side after this
             statement has executed.
 
-            The fused assignment operators are equivalent to applying the
-            arithmetic or bitwise operator to the lhs and rhs of the
-            expression before storing into the lhs.
+            The fused assignment operators are equivalent to applying the       | I don't think this is true.
+            arithmetic or bitwise operator to the lhs and rhs of the            | foo()# += 1  is not the same as foo()# = foo()# + 1
+            expression before storing into the lhs.                             | unless this is intentionally different to C.
 
             Type:
 
@@ -1738,7 +1738,7 @@ TABLE OF CONTENTS:
             is omitted, then it is equivalent to matching it against a gap
             pattern. If all elements match, then this is a successful match.
 
-            Array pattenrs recursively check each member of the array that is
+            Array pattenrs recursively check each member of the array that is   | s/pattenrs/patterns/
             provided. The array length must be part of the match. If all array
             elements match, then this is a successful match.
 
